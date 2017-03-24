@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es5",
+        "noImplicitAny": false,
+        "sourceMap": true
+    },
+    "files": [
+        "src/worktimer-app/worktimer-app.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "typings/**"
+    ],
+    "compileOnSave": true
+}

@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>worktimer-app test</title>
+
+    <script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../bower_components/web-component-tester/browser.js"></script>
+
+    <link rel="import" href="../../src/worktimer-app/worktimer-app.html">
+  </head>
+  <body>
+    <test-fixture id="basic">
+      <template>
+        <worktimer-app></worktimer-app>
+      </template>
+    </test-fixture>
+
+    <script>
+
+      // polymer test (WCT), is slow on windows, due to scanning for usable browsers ...
+      // TEST in browser http://localhost:8080/test/worktimer-app/worktimer-app_test.html
+
+      suite('worktimer-app', function() {
+
+        // Trying to create groups of tests, using a label like 'A00'.
+        // 'A'is the group type and '00' test sequence number.
+
+        test('A01: instantiating the element works', function() {
+          var element = fixture('basic');
+          assert.equal(element.is, 'worktimer-app');
+        });
+
+
+        // Test group 'internal function _printTimeHHMM()'
+        test('B01: internal function _printTimeHHMM()', function() {
+          var element = fixture('basic');
+          var clock;
+
+          assert.equal(element._printTimeHHMM(0), '0:00', "Zero time");
+          assert.equal(element._printTimeHHMM(0, true), '00:00', "Zero time");
+          assert.equal(element._printTimeHHMM(0, false), '0:00', "Zero time");
+
+          clock = sinon.useFakeTimers(new Date(2017, 1, 10, 7, 8, 9).getTime());
+          assert.equal(element._printTimeHHMM(new Date()), '7:08', "Small time, single digit, no leading zero");
+          assert.equal(element._printTimeHHMM(new Date(),true), '07:08', "Leading zero time, single digit");
+          clock.restore();
+
+          clock = sinon.useFakeTimers(new Date(2017, 1, 10, 17, 18, 19).getTime());
+          assert.equal(element._printTimeHHMM(new Date(),false), '17:18', "Time, two digits");
+          assert.equal(element._printTimeHHMM(new Date(),true), '17:18', "Time, two digits, no leading zero");
+          clock.restore();
+
+          // 24Hours and 32 minutes in seconds
+          assert.equal(element._printTimeHHMM((24 * 60 * 60) + (32 * 60), true), '00:32', "Day (24 hours) border passed");
+        });
+
+
+        // Test group 'internal function _shortDateYYMMDD()'
+        test('C01: internal function _shortDateYYMMDD()', function() {
+          var element = fixture('basic');
+          var clock;
+          clock = sinon.useFakeTimers(new Date(2017, 1, 10, 17, 18, 19).getTime());
+          assert.equal(element._shortDateYYMMDD(), '170210', "Default current date time, na parameter given");
+          assert.equal(element._shortDateYYMMDD(0), '170210', "Default current date time, using zero");
+          assert.equal(element._shortDateYYMMDD(new Date().getTime()), '170210', "Short date YYMMDD");
+          assert.equal(element._shortDateYYMMDD(new Date().getTime() + 24 * 60 * 60 * 1000), '170211', "Next day, short date YYMMDD");
+          clock.restore();
+        });
+
+
+        // Worktimer App functionality
+        // https://www.polymer-project.org/1.0/docs/tools/tests
+
+        // Using `setTimeout(function(){}, 10|20|30|...)` to structure the correct
+        // sequence of time management events in the App.
+        // Basically manipulation the JS execution stack.
+
+        test('F01: Initialization App (first time opened)', function(done) {
+          var element = fixture('basic');
+
+          // Reset data in localStorage
+          localStorage.removeItem("timerStorage");
+
+          // Put timeout check before sinon.useFakeTimers() is active.
+          setTimeout( function () {
+            var _timerData = JSON.parse(localStorage.getItem("timerStorage"));
+            var str = '';
+
+            str = element.querySelector("#data-working-time").textContent;
+            assert.equal(str, '0:00', "Just starting, so working time is");
+
+            str = element.querySelector("#data-starttime").textContent;
+            assert.equal(str, '-:--', "Start working at");
+
+            str = element.querySelector("#overtime").textContent;
+            assert.equal(str, '0:00', "No overtime at all");
+
+            str = element.querySelector("#data-endworktime").textContent;
+            assert.equal(str, ' ', "Ready with daily work at");
+
+            str = _timerData.currentDate;
+            assert.equal(str, '170210', "Current date, using fake timer");
+
+            str = _timerData.startTimeMilliSec;
+            assert.equal(str, '0', "Start work at time");
+
+            str = _timerData.saldoSeconds;
+            assert.equal(str, '0', "Over time");
+
+            str = _timerData.dailyWorkSeconds;
+            assert.equal(str, '0', "Already worked today");
+
+            clock.restore();
+            done();
+          }, 10);
+
+          // User starts working at 09:00:00
+          clock = sinon.useFakeTimers(new Date(2017, 1, 10, 9, 0, 0).getTime());
+        });
+
+        test('F02: Start Timer by user', function(done) {
+          var clock;
+          var element = fixture('basic');
+
+          // Reset data in localStorage
+          localStorage.removeItem("timerStorage");
+
+          // Put timeout actions before sinon.useFakeTimers() is active.
+          setTimeout( function () {
+            var _timerData = JSON.parse(localStorage.getItem("timerStorage"));
+            var str = _timerData.startTimeMilliSec;
+            assert.equal(str, '0', "Start work at time");
+            element.$$("#btn-start").click();
+          }, 10);
+
+          setTimeout( function () {
+            var _timerData = JSON.parse(localStorage.getItem("timerStorage"));
+            var str = '';
+
+            str = element.querySelector("#data-starttime").textContent;
+            assert.equal(str, '9:00', "Start working at");
+
+            str = element.querySelector("#overtime").textContent;
+            assert.equal(str, '0:00', "No overtime at all");
+
+            str = element.querySelector("#data-endworktime").textContent;
+            assert.equal(str, '17:00', "Ready with daily work at");
+
+            clock.restore();
+            done();
+          }, 20);
+
+          // User starts working at 09:00:00
+          clock = sinon.useFakeTimers(new Date(2017, 1, 10, 9, 0, 0).getTime());
+        });
+
+        test('F03: Monitoring working hours, full 1 hour', function(done) {
+          var clock;
+          var element = fixture('basic');
+
+          // localStorage.setItem("timerStorage", "********");
+          // localStorage.getItem("timerStorage"); 
+          localStorage.removeItem("timerStorage");
+
+          // Give the App and sinon.useFakeTimers() some time to react/prepare
+          // User STARTS the timer
+          setTimeout(function() {
+            element.$$("#btn-start").click();
+          }, 10);
+
+          // Set local time 10:31:00, as time passes by
+          setTimeout(function() {
+            clock.restore();
+            clock = sinon.useFakeTimers(new Date(2017, 1, 10, 10, 31, 0).getTime());
+          }, 20);
+
+          // Stop working at 10:31:00
+          // User STOPS the timer
+          setTimeout(function() {
+            element.$$("#btn-stop").click();
+          }, 30);
+
+          // Check timer data
+          setTimeout(function() {
+            var _timerData = JSON.parse(localStorage.getItem("timerStorage"));
+            var str = '';
+
+            str = element.querySelector("#data-working-time").textContent;
+            assert.equal(str, '1:01', "Ended working");
+
+            str = element.querySelector("#overtime").textContent;
+            assert.equal(str, '0:00', "No overtime at all");
+
+            str = element.querySelector("#data-endworktime").textContent;
+            assert.equal(str, '17:30', "Ready with daily work at");
+
+            str = _timerData.dailyWorkSeconds;
+            assert.equal(str, '3660', "Worked today in seconds");
+
+            clock.restore();
+            done();
+          }, 40);
+
+          // User starts working at 09:30:00
+          clock = sinon.useFakeTimers(new Date(2017, 1, 10, 9, 30, 0).getTime());
+        });
+  
+        test('F04: Start Stop start stop timer', function(done) {
+          var clock;
+          var element = fixture('basic');
+
+          localStorage.removeItem("timerStorage");
+
+          // Give the App and sinon.useFakeTimers() some time to react/prepare
+          // User STARTS the timer at 10:00:00
+          setTimeout(function() {
+            element.$$("#btn-start").click();
+          }, 10);
+
+          // Set local time 12:25:00, as time passes by
+          setTimeout(function() {
+            clock.restore();
+            clock = sinon.useFakeTimers(new Date(2017, 2, 10, 12, 25, 0).getTime());
+          }, 20);
+
+          // User STOPS the timer at  12:25:00
+          setTimeout(function() {
+            element.$$("#btn-stop").click();
+          }, 30);
+
+          // Set local time 12:35:00, user pauses for 10 min.
+          setTimeout(function() {
+            clock.restore();
+            clock = sinon.useFakeTimers(new Date(2017, 2, 10, 12, 35, 0).getTime());
+          }, 40);
+          
+          // User STARTS the timer at  12:35:00
+          setTimeout(function() {
+            element.$$("#btn-start").click();
+          }, 50);
+
+          // Set local time 18:10:00, user stops working
+          setTimeout(function() {
+            clock.restore();
+            clock = sinon.useFakeTimers(new Date(2017, 2, 10, 18, 10, 0).getTime());
+          }, 60);
+
+          // User STOPS the timer at 18:10:00
+          setTimeout(function() {
+            element.$$("#btn-stop").click();
+          }, 70);
+
+          // Check timer data
+          setTimeout(function() {
+            var _timerData = JSON.parse(localStorage.getItem("timerStorage"));
+            var str = '';
+
+            str = element.querySelector("#data-working-time").textContent;
+            assert.equal(str, '8:00', "Ended working");
+
+            str = element.querySelector("#overtime").textContent;
+            assert.equal(str, '0:00', "No overtime at all");
+
+            str = element.querySelector("#data-endworktime").textContent;
+            assert.equal(str, '18:10', "Ready with daily work at");
+
+            str = _timerData.dailyWorkSeconds;
+            assert.equal(str, '28800', "Worked today in seconds");
+
+            clock.restore();
+            done();
+          }, 80);
+
+          // User starts working at 10:00:00
+          clock = sinon.useFakeTimers(new Date(2017, 2, 10, 10, 0, 0).getTime());
+        });
+
+        test('F05: Creating overtime', function(done) {
+          var clock;
+          var element = fixture('basic');
+
+          localStorage.removeItem("timerStorage");
+
+          // Give the App and sinon.useFakeTimers() some time to react/prepare
+          // User STARTS the timer at 16:30:00
+          setTimeout(function() {
+            element.$$("#btn-start").click();
+          }, 10);
+
+          // Set local time 01:00:00, next day, as time passes by
+          setTimeout(function() {
+            clock.restore();
+            clock = sinon.useFakeTimers(new Date(2017, 1, 11, 1, 0, 0).getTime());
+          }, 20);
+
+          // User STOPS the timer  at 01:00:00 (next day 11 jan)
+          setTimeout(function() {
+            element.$$("#btn-stop").click();
+          }, 30);
+
+          // Check timer data
+          setTimeout(function() {
+            var _timerData = JSON.parse(localStorage.getItem("timerStorage"));
+            var str = '';
+
+            str = element.querySelector("#data-working-time").textContent;
+            // It's 0:00 because of the new day, 
+            assert.equal(str, '0:00', "Ended working");
+
+            str = element.querySelector("#overtime").textContent;
+            assert.equal(str, '0:30', "No overtime at all");
+
+            str = element.querySelector("#data-endworktime").textContent;
+            assert.equal(str, '00:30', "Ready with daily work at");
+
+            str = _timerData.dailyWorkSeconds;  // Because of the new day
+            assert.equal(str, '0', "Worked today in seconds");
+
+            str = _timerData.saldoSeconds;  // 30 min overtime, in the new day
+            assert.equal(str, '1800', "Worked today in seconds");
+
+            str = _timerData.startTimeMilliSec;  // 30 min overtime, in the new day
+            assert.equal(str, '0', "Not started working today (new day)");
+
+            clock.restore();
+            done();
+          }, 40);
+
+          // User starts working at 16:30:00
+          clock = sinon.useFakeTimers(new Date(2017, 1, 10, 16, 30, 0).getTime());
+        });
+  
+        test('F06: Adding to overtime on workday (ma, tu, we, th, fr)', function(done) {
+          var clock;
+          var element = fixture('basic');
+
+          localStorage.removeItem("timerStorage");
+          // Overtime 7:45 = 27900 sec.
+          // Daily working time 8:15 = 29700 sec.
+          // startTimeMilliSec = 0, meaning time has been stopped.
+          localStorage.setItem("timerStorage", '{"startTimeMilliSec": "0", "saldoSeconds": "27900", "currentDate": "170207", "dailyWorkSeconds": "29700", "notification": "default"}');
+
+          // Give the App and sinon.useFakeTimers() some time to react/prepare
+          // Set local time 10:15, next day (wednesday Feb 8)
+          setTimeout(function() {
+            var _timerData = JSON.parse(localStorage.getItem("timerStorage"));
+            var str = '';
+
+            str = _timerData.dailyWorkSeconds;
+            assert.equal(str, ((8 * 60 + 15) * 60).toString(), "Worked 8 hours, plus 15 min overtime");
+
+            str = _timerData.saldoSeconds;
+            assert.equal(str, ((7 * 60 + 45) * 60).toString(), "Overtime 7h45");
+
+            str = _timerData.currentDate;
+            assert.equal(str, element._shortDateYYMMDD(), "Date Feb 7, 2017");
+
+            // Set time to next day. Simulation midnight, recalculation of overtime.
+            clock.restore();
+            clock = sinon.useFakeTimers(new Date(2017, 1, 8, 10, 15, 0).getTime());
+          }, 10);
+
+          // The following START / STOP action will simulate the start of the app, 
+          // where current Date change is detected (passing midnight)
+
+          // User STARTS the timer at at 10:15:00 - just to be prepare overtime calucation
+          setTimeout(function() {
+            element.$$("#btn-start").click();
+          }, 20);
+
+          // Stopping the time will invoke the calculation of overtime, increasing with 15min.
+          setTimeout(function() {
+            element.$$("#btn-stop").click();
+          }, 30);
+
+          // Check 
+          setTimeout(function() {
+            var _timerData = JSON.parse(localStorage.getItem("timerStorage"));
+            var str = _timerData.currentDate;
+            assert.equal(str, element._shortDateYYMMDD(), "Date Feb 8, 2017");
+          }, 30);
+
+          // Check timer data
+          setTimeout(function() {
+            var _timerData = JSON.parse(localStorage.getItem("timerStorage"));
+            var str = '';
+
+            str = element.querySelector("#data-working-time").textContent;
+            // It's 0:00 because of the new day, 
+            assert.equal(str, '0:00', "Time worked on new day");
+
+            str = _timerData.saldoSeconds;  // 08:00 overtime, in the new day
+            assert.equal(str, '28800', "Overtime in seconds 8:00");
+
+            clock.restore();
+            done();
+          }, 50);
+
+          // User local time 20:00:00
+          clock = sinon.useFakeTimers(new Date(2017, 1, 7, 20, 0, 0).getTime());
+        });
+  
+        test('F07: Working weekend, handle always as overtime (from saterday to sunday)', function(done) {
+          var clock;
+          var element = fixture('basic');
+
+          localStorage.removeItem("timerStorage");
+          // NO Overtime (saldoSeconds)
+          // NOT already worked on this day (dailyWorkSeconds)
+          localStorage.setItem("timerStorage", '{"startTimeMilliSec": "0", "saldoSeconds": "0", "currentDate": "170325", "dailyWorkSeconds": "0", "notification": "default"}');
+
+          // Give the App and sinon.useFakeTimers() some time to react/prepare
+          // Local time 10:59, sa. March 25 2017
+          setTimeout(function() {
+            var _timerData = JSON.parse(localStorage.getItem("timerStorage"));
+            var str = '';
+
+            str = _timerData.currentDate;
+            assert.equal(str, element._shortDateYYMMDD(), "Date Mar 25, 2017");
+
+            // User start working,  time 10:59, sa. March 25 2017
+            element.$$("#btn-start").click();
+          }, 10);
+
+          // Simulate passing of time, say 45 min. Which is actual overtime (weekend)
+          setTimeout(function() {
+            clock.restore();
+            // New time 11:44
+            clock = sinon.useFakeTimers(new Date(2017, 2, 25, 11, 44, 0).getTime());
+          }, 20);
+         
+          // Stopping the time will invoke the calculation of overtime, increasing with 45min.
+          setTimeout(function() {
+            element.$$("#btn-stop").click();
+          }, 30);
+
+          // Simulate passing of time, working next day su. March 26 2017
+          setTimeout(function() {
+            clock.restore();
+            // New time 13:34
+            clock = sinon.useFakeTimers(new Date(2017, 2, 26, 13, 34, 0).getTime());
+          }, 40);
+
+          // The following START / STOP action will simulate the start of the app, 
+          // where current Date change is detected (passing midnight)
+          
+          setTimeout(function() {
+            element.$$("#btn-start").click();
+          }, 50);
+
+          setTimeout(function() {
+            element.$$("#btn-stop").click();
+          }, 60);
+
+          // Check timer data
+          setTimeout(function() {
+            var _timerData = JSON.parse(localStorage.getItem("timerStorage"));
+            var str = '';
+
+            str = element.querySelector("#data-working-time").textContent;
+            // It's 0:00 because of the new day, 
+            assert.equal(str, '0:00', "Time worked on new day");
+
+            str = _timerData.saldoSeconds;  // 00:45 overtime, in the new day
+            assert.equal(str, (45 * 60).toString(), "Overtime in seconds 0:45");
+
+            clock.restore();
+            done();
+          }, 70);
+
+          // User local time 10:59:00, sa. March 25 2017
+          clock = sinon.useFakeTimers(new Date(2017, 2, 25, 10, 59, 0).getTime());
+        });
+  
+        test('F08: Working weekend, handle always as overtime (from sunday to monday)', function(done) {
+          var clock;
+          var element = fixture('basic');
+
+          localStorage.removeItem("timerStorage");
+          // NO Overtime (saldoSeconds)
+          // NOT already worked on this day (dailyWorkSeconds)
+          localStorage.setItem("timerStorage", '{"startTimeMilliSec": "0", "saldoSeconds": "0", "currentDate": "170326", "dailyWorkSeconds": "0", "notification": "default"}');
+
+          // Give the App and sinon.useFakeTimers() some time to react/prepare
+          // Local time 10:59, su. March 26 2017
+          setTimeout(function() {
+            var _timerData = JSON.parse(localStorage.getItem("timerStorage"));
+            var str = '';
+
+            str = _timerData.currentDate;
+            assert.equal(str, element._shortDateYYMMDD(), "Date Mar 26, 2017");
+
+            // User start working, time 10:59, su. March 26 2017
+            element.$$("#btn-start").click();
+          }, 10);
+
+          // Simulate passing of time, say 45 min. Which is actual overtime (weekend)
+          setTimeout(function() {
+            clock.restore();
+            // New time 11:44
+            clock = sinon.useFakeTimers(new Date(2017, 2, 26, 11, 44, 0).getTime());
+          }, 20);
+
+          // Stopping the time will invoke the calculation of overtime, increasing with 45min.
+          setTimeout(function() {
+            element.$$("#btn-stop").click();
+          }, 30);
+
+          // Simulate passing of time, working next day mo. March 27 2017
+          setTimeout(function() {
+            clock.restore();
+            // New time 13:34
+            clock = sinon.useFakeTimers(new Date(2017, 2, 27, 13, 34, 0).getTime());
+          }, 40);
+
+          // The following START / STOP action will simulate the start of the app, 
+          // where current Date change is detected (passing midnight)
+          
+          setTimeout(function() {
+            element.$$("#btn-start").click();
+          }, 50);
+
+          setTimeout(function() {
+            element.$$("#btn-stop").click();
+          }, 60);
+
+          // Check timer data
+          setTimeout(function() {
+            var _timerData = JSON.parse(localStorage.getItem("timerStorage"));
+            var str = '';
+
+            str = element.querySelector("#data-working-time").textContent;
+            // It's 0:00 because of the new day, 
+            assert.equal(str, '0:00', "Time worked on new day");
+
+            str = _timerData.saldoSeconds;  // 00:45 overtime, in the new day
+            assert.equal(str, (45 * 60).toString(), "Overtime in seconds 0:45");
+
+            clock.restore();
+            done();
+          }, 70);
+
+          // User local time 10:59:00, sa. March 26 2017
+          clock = sinon.useFakeTimers(new Date(2017, 2, 26, 10, 59, 0).getTime());
+        });
+  
+      });
+    
+  </script>
+  </body>
+</html>

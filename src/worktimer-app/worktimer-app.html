@@ -1,0 +1,149 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+
+@license
+Worktimer Web App Copyright (c) 2017 Kamper GUI
+This code may only be used under the BSD style license.
+
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../my-icons.html">
+
+<dom-module id="worktimer-app">
+  <template>
+    <style>
+      :host {
+        /* https://color.adobe.com/My-Color-Theme-color-theme-6766939/edit/?copy=true */
+        --worktime-theme-background-color: #B24ABF;
+        --worktime-theme-header-color: #82368C;
+        --worktime-theme-button-background-color: #ED63FF;
+        --worktime-theme-background-color3: #3C1940;  /* unused */
+        --worktime-theme-background-color4: #D559E5;  /* unused */
+
+        display: block;
+      }
+      app-header {
+        background-color: var(--worktime-theme-header-color);
+        color: #FFF;
+      }
+      .btn-stop {
+        background-color: var(--worktime-theme-button-background-color);
+      }
+      .timerContent {
+        padding: 2em 1.4em;
+        color: #FFF;
+      }
+      .big {
+        --iron-icon-height: 64px;
+        --iron-icon-width: 64px;
+        margin-right: 0.5em;
+      }
+      .timer--started {
+        margin-right: 0.57em;
+        padding-right: 0.69em;
+      }
+      .timer--overtime span {
+        display: inline-block;
+        padding: 0.2em 0;
+      }
+      .timer--overtime .timer--time {
+        padding-left: 0.4em;
+        padding-right: 0.4em;
+      }
+      .timer--fullday {
+        margin-right: 0.57em;
+        padding-right: 0.69em;        
+      }
+      .HIDE {
+        visibility: hidden;
+      }
+      .timer--time {
+        font-weight: bold;
+      }
+      .timer--time__noovertime {
+        background-color: #CC2222;
+        border-radius: 0.3em;
+      }
+      .timer__right {
+        text-align: right;
+      }
+   </style>
+
+    <iron-localstorage name="timerStorage" value="{{_timerData}}" on-iron-localstorage-load-empty="_initializeTimerData"></iron-localstorage>
+
+    <app-header condenses reveals effects="waterfall">
+      <app-toolbar>
+        <div main-title>At work timer</div>
+        <div id="data-working-time">[[workingTime]]</div>
+      </app-toolbar>
+    </app-header>
+
+    <div class="timerContent">
+      <div hidden$="[[isTimerActive]]">
+        <paper-button id="btn-start" on-tap="_startWork" tabindex="1"><iron-icon class="big" icon="my-icons:hourglassGrey"></iron-icon>Start werken</paper-button>
+      </div>
+
+      <div hidden$="[[!isTimerActive]]">
+        <paper-button id="btn-stop" on-tap="_stopWork" tabindex="1"><iron-icon class="big" icon="my-icons:hourglass"></iron-icon>Stop werken</paper-button>        
+      </div>
+
+      <div class="timer--overtime timer__right">
+        <paper-button on-tap="_onTapOpenModal" tabindex="1"><span class="timer--label">Overwerk</span> <span id="overtime" class="timer--time">[[overtime]]</span></paper-button>
+      </div>
+
+      <div hidden$="[[!isTimerActive]]">
+        <div class="timer--started timer__right"><span class="timer--label">Begonnen om</span> <span id="data-starttime" class="timer--time">[[timerStartTime]]</span></div>
+      </div>
+
+      <div hidden$="{{_showStopWorking(_timerData.startTimeMilliSec)}}" class="timer--fullday timer__right">
+        <span class="timer--label">U kunt stoppen met werken</span><!-- You can stop working now -->
+        <span class="timer--time HIDE">8:00</span><!-- time will not be shown, acts as a filler -->
+      </div>
+
+      <div hidden$="{{_showEndTime(_timerData.startTimeMilliSec)}}" class="timer--fullday timer__right">
+        <span class="timer--label">Stoppen met werken om</span><!-- you can stop working at ... -->
+        <span id="data-endworktime" class="timer--time">[[endWorkTime]]</span>
+      </div>
+    </div>
+
+    <paper-dialog id="paperDialog" modal>
+      <h2>Verander overwerk</h2>
+      <div>
+        <paper-input
+          id="overwork"
+          label="HH:MM"
+          required
+          focused
+          tabindex="1"
+          value="">
+        </paper-input>
+      </div>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button on-tap="_onTapAcceptNewOverwork" dialog-confirm autofocus>Accept</paper-button>
+      </div>
+    </paper-dialog>
+
+  </template>
+
+  <script src="worktimer-app.js"></script>
+  
+</dom-module>

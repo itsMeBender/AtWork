@@ -1,0 +1,16 @@
+{
+	"rules": {
+		"no-unused-expression": true,
+		"no-duplicate-variable": true,
+		"no-unused-variable": true,
+		"no-use-before-declare": true,
+		"no-var-keyword": true,
+		"no-trailing-whitespace": true,
+		"curly": true,
+		"class-name": true,
+		"semicolon": ["always"],
+	    "comment-format": [true, "check-space"],
+	    "max-line-length": [true, 140],
+		"triple-equals": true
+	}
+}
