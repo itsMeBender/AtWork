@@ -12,14 +12,12 @@ The display presents the following information;
 * A message at what time you can stop working.
 * Start working at time.
 
-sss
 ## Technical aspects
 
 * There's a timer which updates the information on display every minute.
 * Information is stored in local-storage. Which is deletect when you instruct your browser to clear, reset data (cookies).
 * Using MicroSoft TypeScript and VSC-editor (config files).
 * A notification is pushed, when 8 hours worktime is reached.
-
 
 ### Nice features to have
 
