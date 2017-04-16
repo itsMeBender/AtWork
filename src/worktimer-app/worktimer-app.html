@@ -25,6 +25,7 @@ This code may only be used under the BSD style license.
 <link rel="import" href="../../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
 <link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../../bower_components/bender-clock/bender-clock.html">
 <link rel="import" href="../my-icons.html">
 
 <dom-module id="worktimer-app">
@@ -85,6 +86,21 @@ This code may only be used under the BSD style license.
       .timer__right {
         text-align: right;
       }
+
+      .analog {
+        position: absolute;
+        top: 20em;
+        width: 100%;
+      }
+
+      bender-clock {
+        margin-left: auto;
+        margin-right: auto;
+        width: 10em;
+        --bender-clock-background-color: #82368C;
+        --bender-clock-border-color: #EEEEEE;
+
+      }
    </style>
 
     <iron-localstorage name="timerStorage" value="{{_timerData}}" on-iron-localstorage-load-empty="_initializeTimerData"></iron-localstorage>
@@ -122,6 +138,10 @@ This code may only be used under the BSD style license.
         <span class="timer--label">Stoppen met werken om</span><!-- you can stop working at ... -->
         <span id="data-endworktime" class="timer--time">[[endWorkTime]]</span>
       </div>
+    </div>
+
+    <div class="analog">
+      <bender-clock></bender-clock>
     </div>
 
     <paper-dialog id="paperDialog" modal>

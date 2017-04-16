@@ -4,12 +4,14 @@
   "main": "index.html",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0",
+    "bender-clock": "C:/Users/Pieter/Desktop/Mijn Documenten/20 Kamper GUI/00 Projecten/50_Web_Componenten/catalogus/webc-bender-clock/bender-clock/",
     "paper-input": "PolymerElements/paper-input#^1.1.23",
     "iron-localstorage": "PolymerElements/iron-localstorage#^1.0.6",
-    "iron-icon": "PolymerElements/iron-icon^1.2.0",
     "app-layout": "PolymerElements/app-layout#^0.10.6",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
-    "paper-dialog": "PolymerElements/paper-dialog#^1.1.0"
+    "paper-dialog": "PolymerElements/paper-dialog#^1.1.0",
+    "paper-button": "PolymerElements/paper-button#^1.0.14",
+    "iron-icons": "PolymerElements/iron-icons#^1.2.0"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
