@@ -12,6 +12,8 @@ The display presents the following information;
 * A message at what time you can stop working.
 * Start working at time.
 
+![An example](images/layout-timer-app-EN.png)
+
 ## Technical aspects
 
 * There's a timer which updates the information on display every minute.
