@@ -9,7 +9,6 @@ build
 
 # Transpiled JS files
 
-
 # TypeScript
 *.map
 typings/
@@ -17,6 +16,9 @@ typings/
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
+
+# Gulp - sFTP connection
+gulpfile.js
 
 # Folder config file
 Desktop.ini
