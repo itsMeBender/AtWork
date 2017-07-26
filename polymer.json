@@ -30,6 +30,8 @@
     "bower_components/app-layout/app-toolbar/app-toolbar.html",
     "bower_components/app-layout/app-header/app-header.html",
     "bower_components/bender-clock/bender-clock.html",
+    "bower_components/kgui-single-digit/kgui-single-digit.html",
+    "bower_components/kgui-single-digit/kgui-multi-digits.html",
   	"src/worktimer-app/worktimer-app.js",
   	"favicon.ico",
     "bower_components/webcomponentsjs/webcomponents-lite.min.js"
