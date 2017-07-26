@@ -27,7 +27,7 @@ interface TimerData {
     "notificationSend": boolean;    // Is notification given today, allowing only one per day
 }
 
-declare var Notification: any; // Or download 'chrome.d.ts', which I did but it didn't work.
+// declare var Notification: Notification; // Or download 'chrome.d.ts', which I did but it didn't work.
 
 Polymer({
 
@@ -260,9 +260,9 @@ Polymer({
                                 // https://developer.mozilla.org/en/docs/Web/API/notification
                                 let notification = new Notification('At Work', {
                                     body:   'U heeft vandaag 8 uur gewerkt.',
-                                    badge:  '/images/manifest/icon-144x144.png',
+                                    // ??NO SUPPORT?? badge:  '/images/manifest/icon-144x144.png',
                                     icon:   '/images/manifest/icon-72x72.png',
-                                    requireInteraction: true
+                                    // ??NO SUPPORT?? requireInteraction: true
                                 });
 
                                 notification.onshow = function() {

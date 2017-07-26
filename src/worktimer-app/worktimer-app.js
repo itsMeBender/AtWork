@@ -1,5 +1,6 @@
 // DOCUMENTATION GUIDELINES  https://www.polymer-project.org/1.0/docs/tools/documentation#type-annotation
 /// <reference path="../../typings/index.d.ts" />
+// declare var Notification: Notification; // Or download 'chrome.d.ts', which I did but it didn't work.
 Polymer({
     // If localStore 'timerStorage' does not exist, create one.
     _initializeTimerData: function () {
@@ -197,9 +198,8 @@ Polymer({
                                 // https://developer.mozilla.org/en/docs/Web/API/notification
                                 var notification = new Notification('At Work', {
                                     body: 'U heeft vandaag 8 uur gewerkt.',
-                                    badge: '/images/manifest/icon-144x144.png',
+                                    // ??NO SUPPORT?? badge:  '/images/manifest/icon-144x144.png',
                                     icon: '/images/manifest/icon-72x72.png',
-                                    requireInteraction: true
                                 });
                                 notification.onshow = function () {
                                     console.log('Notification shown');
