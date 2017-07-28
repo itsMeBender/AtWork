@@ -1,6 +1,7 @@
 {
   "name": "worktimer",
   "description": "To monitor time spend on work",
+  "version": "1.1.1",
   "main": "index.html",
   "dependencies": {
     "app-layout": "PolymerElements/app-layout#^0.10.6",
