@@ -31,7 +31,7 @@ The display presents the following information;
 
 ## Problems detected
 
-This Web App is more or less a journey into learning Web Applications, TypeScript and Google Polymer. Goal is to make a Fully Progressive Web Application. But some functionallity I need to explore, does are;
+This Web App is more or less a journey into learning Web Applications, TypeScript and Google Polymer. Goal is to make a Fully Progressive Web Application. But some functionallity I need to explore, to do are;
 
 * Working off-line, no internet connection. Now it freezes, when no internet is available. Why, I don't know.
 * Push notifications, it seems to work on deveopment PC, but not on mobile phone.
