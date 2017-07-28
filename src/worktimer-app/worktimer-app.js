@@ -13,32 +13,16 @@ Polymer({
             "notificationSend": false // Notification not yet given
         };
     },
-    // Process new OVERTIME data, entered by the user. Format HH:MM
+    // Process new OVERTIME data, entered by the user. Format (H)HMM, no ':'.
     _onTapAcceptNewOverwork: function () {
-        if (this.$.overwork.value) {
-            var hhmm = this.$.overwork.value.split(":");
-            if (hhmm.length === 2) {
-                var patternMM = new RegExp("^\\d\\d$");
-                var patternHH = new RegExp("^\\d+$");
-                // Accept only numbers
-                if (!patternHH.test(hhmm[0])) {
-                    return;
-                }
-                if (!patternMM.test(hhmm[1])) {
-                    return;
-                }
-                // Minutes below 60
-                if (parseInt(hhmm[1], 10) < 60) {
-                    // We will skip seconds
-                    this.set("_timerData.saldoSeconds", (hhmm[0] * 60 * 60 + hhmm[1] * 60).toString());
-                    this.overtime = this._printTimeHHMM(this._timerData.saldoSeconds);
-                }
-            }
-        }
+        var minutes = parseInt(this.$.timedigits.number.slice(-2));
+        var hours = Math.floor(parseInt(this.$.timedigits.number, 10) / 100);
+        this.set("_timerData.saldoSeconds", (hours * 60 * 60 + minutes * 60).toString());
+        this.overtime = this._printTimeHHMM(this._timerData.saldoSeconds);
     },
     // Activate modal popup to change overtime.
     _onTapOpenModal: function (e) {
-        this.$.overwork.value = this.overtime;
+        this.$.timedigits.number = this.overtime.replace(/:/, '');
         this.$.paperDialog.open();
     },
     // Print HH:MM. Time as DATE object or number as SECONDS.

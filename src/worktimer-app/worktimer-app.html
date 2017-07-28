@@ -19,13 +19,13 @@ This code may only be used under the BSD style license.
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
 <link rel="import" href="../../bower_components/app-layout/app-header-layout/app-header-layout.html">
 <link rel="import" href="../../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
 <link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
 <link rel="import" href="../../bower_components/bender-clock/bender-clock.html">
+<link rel="import" href="../../bower_components/kgui-single-digit/kgui-multi-digits.html">
 <link rel="import" href="../my-icons.html">
 
 <dom-module id="worktimer-app">
@@ -71,7 +71,7 @@ This code may only be used under the BSD style license.
       }
       .timer--fullday {
         margin-right: 0.57em;
-        padding-right: 0.69em;        
+        padding-right: 0.69em;
       }
       .HIDE {
         visibility: hidden;
@@ -100,6 +100,10 @@ This code may only be used under the BSD style license.
         --bender-clock-background-color: #82368C;
         --bender-clock-border-color: #EEEEEE;
 
+      }
+      kgui-multi-digits {
+        margin-left: auto;
+        margin-right: auto;        
       }
    </style>
 
@@ -147,14 +151,7 @@ This code may only be used under the BSD style license.
     <paper-dialog id="paperDialog" modal>
       <h2>Verander overwerk</h2>
       <div>
-        <paper-input
-          id="overwork"
-          label="HH:MM"
-          required
-          focused
-          tabindex="1"
-          value="">
-        </paper-input>
+        <kgui-multi-digits id="timedigits" format="##:##" number="0"></kgui-multi-digits>
       </div>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>

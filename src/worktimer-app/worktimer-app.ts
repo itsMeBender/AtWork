@@ -43,31 +43,18 @@ Polymer({
         };
     },
 
-    // Process new OVERTIME data, entered by the user. Format HH:MM
+    // Process new OVERTIME data, entered by the user. Format (H)HMM, no ':'.
     _onTapAcceptNewOverwork: function () {
-        if (this.$.overwork.value) {
-            let hhmm = this.$.overwork.value.split(":");
-            if (hhmm.length === 2) {
-                let patternMM = new RegExp ("^\\d\\d$");
-                let patternHH = new RegExp ("^\\d+$");
+        let minutes = parseInt(this.$.timedigits.number.slice(-2));
+        let hours = Math.floor(parseInt(this.$.timedigits.number, 10) / 100);
 
-                // Accept only numbers
-                if (!patternHH.test(hhmm[0])) { return; }
-                if (!patternMM.test(hhmm[1])) { return; }
-
-                // Minutes below 60
-                if (parseInt(hhmm[1], 10) < 60) {
-                    // We will skip seconds
-                    this.set("_timerData.saldoSeconds", (hhmm[0] * 60 * 60 + hhmm[1] * 60).toString());
-                    this.overtime = this._printTimeHHMM(this._timerData.saldoSeconds);
-                }
-            }
-        }
+        this.set("_timerData.saldoSeconds", (hours * 60 * 60 + minutes * 60).toString());
+        this.overtime = this._printTimeHHMM(this._timerData.saldoSeconds);
     },
 
     // Activate modal popup to change overtime.
     _onTapOpenModal: function (e) {
-        this.$.overwork.value = this.overtime;
+        this.$.timedigits.number = this.overtime.replace(/:/, '');
         this.$.paperDialog.open();
     },
 
