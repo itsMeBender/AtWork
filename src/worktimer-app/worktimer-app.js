@@ -215,10 +215,30 @@ Polymer({
         "_manageTimerData(_timerData.startTimeMilliSec)"
     ],
     properties: {
+        // You can stop working at time
+        endWorkTime: {
+            type: String,
+            value: '00:00',
+        },
         // TRUE when timer is active and user is working
         isTimerActive: {
             type: Boolean,
             value: false,
+        },
+        // Working overtime in the past.
+        overtime: {
+            type: String,
+            value: '0:00',
+        },
+        // Timer started at
+        timerStartTime: {
+            type: String,
+            value: '00:00',
+        },
+        // Time worked today, updated per minute
+        workingTime: {
+            type: String,
+            value: '0:00',
         },
         // Timer Object with data on user working progress (in local Storage)
         _timerData: {
