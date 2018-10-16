@@ -32,6 +32,7 @@
     "bower_components/app-layout/app-scroll-effects/app-scroll-effects.html",
     "bower_components/app-layout/app-header/app-header.html",
     "bower_components/webcomponentsjs/webcomponents-lite.min.js",
+  	"images/favicon.png",
   	"favicon.ico",
     "src/worktimer-app/worktimer-app.js"
   ]
